@@ -2,7 +2,18 @@
 
 namespace App;
 
-use Exception;
+use function fopen;
+use function stream_set_read_buffer;
+use function gc_disable;
+use function fgets;
+use function strpos;
+use function substr;
+use function fclose;
+use function gc_enable;
+use function count;
+use function ksort;
+use function json_encode;
+use function fwrite;
 
 final class Parser
 {
