@@ -17,7 +17,6 @@ final class Parser
 
         while(($line = fgets($fileHandle)) !== false) {
             $comma = strpos($line, ',');
-
             $path = substr($line, 19, $comma - 19);
             $date = substr($line, $comma + 1, 10);
             
@@ -30,6 +29,7 @@ final class Parser
 
         fclose($fileHandle);
         gc_enable();
+        unset($fileHandle, $line);
 
         foreach ($output as &$dates) {
             if (count($dates) > 1) {
@@ -39,7 +39,10 @@ final class Parser
         unset($dates);
 
         $json = json_encode($output, JSON_PRETTY_PRINT);
-        file_put_contents($outputPath, $json);
+        unset($output);
+        $fileHandle = fopen($outputPath, 'wb');
+        fwrite($fileHandle, $json);
+        fclose($fileHandle);
         
     }
 }
