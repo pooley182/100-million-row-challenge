@@ -62,23 +62,17 @@ final class Parser
 
 
         $json ="{\n";
-        $first = true;
+        $s = "";
         foreach($output as $path =>$dates) {
-            if(!$first) {
-                $json .= ",\n";
-            }
-            $json .= '    "' . str_replace('/','\\/', $path) . '"' . ": {\n";
-            $first_date = true;
+            $json .= $s . '    "' . str_replace('/','\\/', $path) . '"' . ": {\n";
+            $sd = "";
             foreach($dates as $date => $count) {
                 if($count === 0) continue;
-                if(!$first_date) {
-                    $json .= ",\n";
-                }
-                    $json .= '        "' . $date . '": ' . $count;
-                $first_date = false;
+                $json .= $sd . '        "' . $date . '": ' . $count;
+                $sd = ",\n";
             }
             $json .= "\n    }";
-            $first = false;
+            $s = ",\n";
         }
         $json .= "\n}";
 
