@@ -10,44 +10,54 @@ use function strpos;
 use function substr;
 use function fclose;
 use function gc_enable;
-use function count;
-use function ksort;
 use function json_encode;
 use function fwrite;
+use function array_filter;
 
 final class Parser
 {
     public function parse(string $inputPath, string $outputPath): void
     {
-        $fileHandle = fopen($inputPath, 'rb');
-        
-        stream_set_read_buffer($fileHandle, 1 << 27); // 128MB buffer
         gc_disable();
 
         $output = [];
+        $dates = [];
+        for ($y = 2020; $y <= 2026; $y++) {
+            for ($m = 1; $m <= 12; $m++) {
+                for ($d = 1; $d <= 31; $d++) {
+                    $date = sprintf('%04d-%02d-%02d', $y, $m, $d);
+                    $dates[$date] = 0;
+
+                }
+            }
+        }
+        unset($y, $m, $d, $date);
+
+        $fileHandle = fopen($inputPath, 'rb');
+        
+        stream_set_read_buffer($fileHandle, 1 << 27); // 128MB buffer
 
         while(($line = fgets($fileHandle)) !== false) {
             $comma = strpos($line, ',');
             $path = substr($line, 19, $comma - 19);
             $date = substr($line, $comma + 1, 10);
-            
-            if (!isset($output[$path][$date])){
-                $output[$path][$date] = 1;
-            } else {
-                $output[$path][$date]++;
+
+            if(!isset($output[$path])) {
+                $output[$path] = $dates;
             }
+
+            $output[$path][$date]++;
+
         }
 
         fclose($fileHandle);
         gc_enable();
         unset($fileHandle, $line);
 
-        foreach ($output as &$dates) {
-            if (count($dates) > 1) {
-                ksort($dates, SORT_STRING);
-            }
+        foreach($output as $p =>$ds) {
+            $output[$p] = array_filter($ds);
         }
-        unset($dates);
+        unset($p, $ds);
 
         $json = json_encode($output, JSON_PRETTY_PRINT);
         unset($output);
