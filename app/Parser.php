@@ -12,8 +12,6 @@ use function fclose;
 use function gc_enable;
 use function str_replace;
 use function fwrite;
-use function str_pad;
-use function array_filter;
 
 final class Parser
 {
@@ -31,7 +29,9 @@ final class Parser
                     default => 31,
                 };
                 for ($d = 1; $d <= $days; $d++) {
-                    $date = $y . '-' . str_pad($m, 2, '0', STR_PAD_LEFT) . '-' . str_pad($d, 2, '0', STR_PAD_LEFT);
+                    $mStr   = $m < 10 ? "0{$m}" : $m;
+                    $dStr   = $d < 10 ? "0{$d}" : $d;
+                    $date = $y . '-' . $mStr . '-' . $dStr;
                     $dates[$date] = 0;
 
                 }
