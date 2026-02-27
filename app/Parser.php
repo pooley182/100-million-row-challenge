@@ -10,7 +10,7 @@ use function strpos;
 use function substr;
 use function fclose;
 use function gc_enable;
-use function json_encode;
+use function str_replace;
 use function fwrite;
 use function str_pad;
 use function array_filter;
@@ -31,7 +31,7 @@ final class Parser
                     default => 31,
                 };
                 for ($d = 1; $d <= $days; $d++) {
-                    $date = $y . '-' . str_pad($m, 2, '0', 0) . '-' . str_pad($d, 2, '0', 0);
+                    $date = $y . '-' . str_pad($m, 2, '0', STR_PAD_LEFT) . '-' . str_pad($d, 2, '0', STR_PAD_LEFT);
                     $dates[$date] = 0;
 
                 }
@@ -60,13 +60,28 @@ final class Parser
         gc_enable();
         unset($fileHandle, $line);
 
-        foreach($output as $p =>$ds) {
-            $output[$p] = array_filter($ds);
-        }
-        unset($p, $ds);
 
-        $json = json_encode($output, JSON_PRETTY_PRINT);
-        unset($output);
+        $json ="{\n";
+        $first = true;
+        foreach($output as $path =>$dates) {
+            if(!$first) {
+                $json .= ",\n";
+            }
+            $json .= '    "' . str_replace('/','\\/', $path) . '"' . ": {\n";
+            $first_date = true;
+            foreach($dates as $date => $count) {
+                if($count === 0) continue;
+                if(!$first_date) {
+                    $json .= ",\n";
+                }
+                    $json .= '        "' . $date . '": ' . $count;
+                $first_date = false;
+            }
+            $json .= "\n    }";
+            $first = false;
+        }
+        $json .= "\n}";
+
         $fileHandle = fopen($outputPath, 'wb');
         fwrite($fileHandle, $json);
         fclose($fileHandle);
