@@ -12,7 +12,7 @@ use function fclose;
 use function gc_enable;
 use function json_encode;
 use function fwrite;
-use function sprintf;
+use function str_pad;
 use function array_filter;
 
 final class Parser
@@ -31,7 +31,7 @@ final class Parser
                     default => 31,
                 };
                 for ($d = 1; $d <= $days; $d++) {
-                    $date = sprintf('%04d-%02d-%02d', $y, $m, $d);
+                    $date = $y . '-' . str_pad($m, 2, '0', 0) . '-' . str_pad($d, 2, '0', 0);
                     $dates[$date] = 0;
 
                 }
