@@ -12,6 +12,7 @@ use function fclose;
 use function gc_enable;
 use function json_encode;
 use function fwrite;
+use function sprintf;
 use function array_filter;
 
 final class Parser
@@ -24,7 +25,12 @@ final class Parser
         $dates = [];
         for ($y = 2020; $y <= 2026; $y++) {
             for ($m = 1; $m <= 12; $m++) {
-                for ($d = 1; $d <= 31; $d++) {
+                $days = match ($m) {
+                    2 => ($y === 2020) || ($y === 2024) ? 29 : 28,
+                    4, 6, 9, 11 => 30,
+                    default => 31,
+                };
+                for ($d = 1; $d <= $days; $d++) {
                     $date = sprintf('%04d-%02d-%02d', $y, $m, $d);
                     $dates[$date] = 0;
 
